@@ -11,7 +11,7 @@
 
 
 Example usage:
-python inspect_byproducts.py -l  /Users/sachitmalik/in-toto/test/demo_files/package.2dc02526.link  -st stderr -p "contains not" -s "s"
+python inspect_byproducts.py -l  /Users/xxxx/xxx/xxxx/package.2dc02526.link  -st stderr -p "contains not" -s "s"
 """
 import os
 import sys
