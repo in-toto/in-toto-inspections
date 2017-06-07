@@ -1,4 +1,5 @@
 """
+
 <Program Name>
   inspect_return_value.py
 
@@ -70,7 +71,7 @@ def inspect_return_value(link, operator, integer):
              for example: given "lt" as an operator, it will inspect whether
              (the return value) <= (the given integer)
 
-         <Exceptions>
+        <Exceptions>
             Yet to add
 
         <Returns>
@@ -93,7 +94,7 @@ def inspect_return_value(link, operator, integer):
 
 
 def main():
-    """Parse the arguments and call inspect_return_value. """
+
     parser = argparse.ArgumentParser(
         description="Inspects the return value of a step")
 

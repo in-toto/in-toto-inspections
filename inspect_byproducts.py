@@ -1,4 +1,5 @@
 """
+
 <Program Name>
   inspect_byproducts.py
 
@@ -28,7 +29,14 @@
   The usage would be as follows:
   python inspect_byproducts.py -l  /user/abc/def/package.45gh325.link  -st stderr -p "contains" -s "test"
 
+  General usage:
+  python inspect_byproducts.py -l  <path/to/link/metadata/file>  -st <stdout|stderr>
+    -p [ "is" | "is not" | "contains" | "contains not"] -s <string to be tested>
+
+
 """
+
+
 import os
 import sys
 import argparse
@@ -53,7 +61,7 @@ def inspect_byproducts(link, std, presence, inputstring):
          whether to check stdout or stderr field
 
      presence:
-         is/is not/contains/contains not
+         is | is not | contains | contains not
 
      inputstring:
          the string to be checked
