@@ -1,17 +1,33 @@
 """
 <Program Name>
   inspect_byproducts.py
+
 <Author>
   Sachit Malik <i.sachitmalik@gmail.com>
+
 <Started>
   June 6, 2017
+
 <Copyright>
   See LICENSE for licensing information.
+
 <Purpose>
 
+  Inspections constitute an important part of in-toto. In this script,
+  we inspect the byproducts(such as stdout/stderr) of a step. The user supplies
+  an input string to the program(whose presence the user wants to test),
+  along with path to the corresponding link file(which link file he wants
+  to test in), and a choice from stdout and stderr, and finally if the
+  corresponding field of stdout/stderr is/is not/contains/contains not
+  the user supplied string.
 
-Example usage:
-python inspect_byproducts.py -l  /Users/sachitmalik/in-toto/test/demo_files/package.2dc02526.link  -st stderr -p "contains not" -s "s"
+  Suppose the link file is located at /user/abc/def/package.45gh325.link
+  and the user wants to check whether for the corresponding step(hence the link file),
+  the corresponding stderr field contains the string "test".
+
+  The usage would be as follows:
+  python inspect_byproducts.py -l  /user/abc/def/package.45gh325.link  -st stderr -p "contains" -s "test"
+
 """
 import os
 import sys
@@ -23,25 +39,52 @@ import securesystemslib.exceptions
 
 
 def inspect_byproducts(link, std, presence, inputstring):
+    """
 
+    <Purpose>
+    A function which performs the inspection as described above depending on various arguments.
+    Prints the boolean True or False depending upon the inspection result.
+
+    <Arguments>
+     link:
+         the path to the link file
+
+     std:
+         whether to check stdout or stderr field
+
+     presence:
+         is/is not/contains/contains not
+
+     inputstring:
+         the string to be checked
+
+     <Exceptions>
+        Yet to add
+
+    <Returns>
+         None.
+
+
+    """
     l = link_import.read_from_file(link)
     std_out_err = l.byproducts[std]
 
     if presence == 'is':
-        print(std_out_err == inputstring)
+      print(std_out_err == inputstring)
 
     elif presence == 'is not':
-        print(std_out_err != inputstring)
+      print(std_out_err != inputstring)
 
     elif presence == 'contains':
-        if (std_out_err.find(inputstring) != -1):
+      if (std_out_err.find(inputstring) != -1):
             print('True')
-        else:
+      else:
             print('False')
+
     elif presence == 'contains not':
-        if (std_out_err.find(inputstring) != -1):
+      if (std_out_err.find(inputstring) != -1):
             print('False')
-        else:
+      else:
             print('True')
 
 
@@ -81,7 +124,7 @@ def main():
     args = parser.parse_args()
 
     if args.verbose:
-        in_toto.log.logging.getLogger.setLevel(log.logging.INFO)
+      in_toto.log.logging.getLogger.setLevel(log.logging.INFO)
 
     inspect_byproducts(args.link, args.outerr, args.presence, args.string)
 
