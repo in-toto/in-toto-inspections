@@ -67,7 +67,7 @@ def inspect_byproducts(link, std, operator, inputstring):
       Integer
       0 - True
       1 - False
-      2 - Wrong input supplied
+      2 - Wrong input
       3 - IOError (Link file is non existent/ path to the link file is invalid
 
     """

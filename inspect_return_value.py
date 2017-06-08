@@ -74,8 +74,10 @@ def inspect_return_value(link, operator, integer):
 
     <Returns>
       Integer
-      0 - If
-      1 - if false
+      0 - True
+      1 - False
+      2 - Wrong Input
+      3 - IOError (Link file is non existent/ path to the link file is invalid)
 
     """
     if not os.path.exists(link):
