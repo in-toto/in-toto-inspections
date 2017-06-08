@@ -53,7 +53,6 @@ def inspect_return_value(link, operator, integer):
     """
     <Purpose>
       A function which performs the inspection as described above depending on various arguments.
-      Prints the boolean True or False depending upon the inspection result.
 
     <Arguments>
       link:
