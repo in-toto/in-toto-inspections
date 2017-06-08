@@ -1,5 +1,4 @@
 """
-
 <Program Name>
   inspect_return_value.py
 
@@ -13,14 +12,14 @@
   See LICENSE for licensing information.
 
 <Purpose>
-
   Inspections constitute an important part of in-toto. In this script,
   we inspect the return value of a step. The user supplies an integer
   to the program(as compared to which the user wants to test various
   boolean operators), along with path to the corresponding link file
   (which link file he wants to test in), and also a bash style boolean
-  operator. It prints True or False depending on the operator and
-  the user supplied integer.
+  operator. It returns an integer, 0 if the condition is true, 1 - if
+  false, 2 - wrong input, 3 - IOError(Link file non-existent or path
+  to the link file is invalid)
 
   Suppose the link file is located at /user/abc/def/package.45gh325.link
   and the user wants to check whether for the corresponding step(hence the link file),
