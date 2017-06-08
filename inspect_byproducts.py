@@ -12,88 +12,106 @@
 <Copyright>
   See LICENSE for licensing information.
 
-<Purpose>
+<Requires>
+  in-toto - installed on the path
 
-  Inspections constitute an important part of in-toto. In this script,
-  we inspect the byproducts(such as stdout/stderr) of a step. The user supplies
-  an input string to the program(whose presence the user wants to test),
-  along with path to the corresponding link file(which link file he wants
-  to test in), and a choice from stdout and stderr, and finally if the
-  corresponding field of stdout/stderr is/is not/contains/contains not
-  the user supplied string.
+<Purpose>
+  Inspections constitute an important part of in-toto. The script take the path
+  of a link file, a random string and an operator, which is used to compare
+  a certain property of the link file with the random string.
 
   Suppose the link file is located at /user/abc/def/package.45gh325.link
-  and the user wants to check whether for the corresponding step(hence the link file),
+  and the user wants to check whether for the corresponding step (hence the link file),
   the corresponding stderr field contains the string "test".
 
   The usage would be as follows:
-  python inspect_byproducts.py -l  /user/abc/def/package.45gh325.link  -st stderr -p "contains" -s "test"
+  python inspect_byproducts.py -l  /user/abc/def/package.45gh325.link  -st stderr -o contains test
 
   General usage:
   python inspect_byproducts.py -l  <path/to/link/metadata/file>  -st <stdout|stderr>
-    -p [ "is" | "is not" | "contains" | "contains not"] -s <string to be tested>
+    -o [ is | is not | contains | contains not] <string to be tested>
 
 
 """
 
-
 import os
 import sys
 import argparse
-import inspect
 import in_toto.log
 from in_toto.models.link import Link as link_import
 import securesystemslib.exceptions
 
 
-def inspect_byproducts(link, std, presence, inputstring):
+def inspect_byproducts(link, std, operator, inputstring):
     """
 
     <Purpose>
-    A function which performs the inspection as described above depending on various arguments.
-    Prints the boolean True or False depending upon the inspection result.
+    A function which performs the inspection as described above depending on
+    various arguments.
 
     <Arguments>
-     link:
-         the path to the link file
+      link:
+        the path to the link file
 
-     std:
-         whether to check stdout or stderr field
+      std:
+        whether to check stdout or stderr field
 
-     presence:
-         is | is not | contains | contains not
+      operator:
+        is | is not | contains | contains not
 
      inputstring:
-         the string to be checked
+        the string to be checked
 
-     <Exceptions>
-        Yet to add
+    <Exceptions>
+      Raises KeyError, in case the field corresponding to the key
+        in the dictionary is empty
 
     <Returns>
-         None.
+      Integer
+        0 - if the inspection is successful
+        1 - if the inspection is unsuccessful
+        2 - if the user supplied arguments are invalid
+
 
 
     """
-    l = link_import.read_from_file(link)
-    std_out_err = l.byproducts[std]
+    if not os.path.exists(link):
+        print("The path to the link file is invalid")
+        return 2
 
-    if presence == 'is':
-      print(std_out_err == inputstring)
+    else:
+      l = link_import.read_from_file(link)
 
-    elif presence == 'is not':
-      print(std_out_err != inputstring)
+      try:
+        std_out_err = l.byproducts[std]
+      except KeyError:
+        raise KeyError("The field corresponding to " + std + " in the link "
+                                                             "file is empty.")
 
-    elif presence == 'contains':
-      if (std_out_err.find(inputstring) != -1):
-            print('True')
-      else:
-            print('False')
+      switch_dict = {'is': (std_out_err == inputstring),
+                     'is not': (std_out_err != inputstring),
+                     'contains': (std_out_err.find(inputstring)),
+                     'contains not': (std_out_err.find(inputstring))}
 
-    elif presence == 'contains not':
-      if (std_out_err.find(inputstring) != -1):
-            print('False')
-      else:
-            print('True')
+      if operator == 'is':
+        if switch_dict[operator]:
+          return 0
+
+      elif operator == 'is not':
+        if switch_dict[operator]:
+          return 0
+
+      elif operator == 'contains':
+        if switch_dict[operator] != -1:
+          return 0
+
+      elif operator == 'contains not':
+        if switch_dict[operator] == -1:
+          return 0
+
+
+      return 1
+
 
 
 def main():
@@ -107,34 +125,52 @@ def main():
                     "%(prog)s --link <path to link metadata>\n{0}"
                     "[--stdout | --stderr]\n{0}"
                     "[--is | --is-not | --contains | --contains-not]\n{0}"
-                    "<string>\n{0}"
+                    "string\n{0}"
                     "[--verbose]\n\n"
                     .format(lpad))
 
     in_toto_args = parser.add_argument_group("in-toto-inspection options")
 
     in_toto_args.add_argument("-l", "--link", type=str, required=True,
-                              help="Link metadata file to use for inspection of the step")
+                              help="Link metadata file to use for inspection "
+                                  "of the step")
 
     in_toto_args.add_argument("-st", "--outerr",
-                              type=str, required=True, help="when stdout or stderr is a byproduct")
+                              type=str, required=True, help="when stdout or "
+                                  "stderr is a byproduct")
 
-    in_toto_args.add_argument("-p", "--presence",
-                              type=str, required=True, help="whether the stdout or stderr is, is not, \ "
-                                                               "contains, contains not, the input string")
+    in_toto_args.add_argument("-o", "--operator",
+                              type=str, required=True, help="whether the "
+                                  "stdout or stderr is, is not, \ "
+                                  "contains, contains not, the input string")
 
-    in_toto_args.add_argument("-s", "--string", type=str, required=True,
-                              help="The string to which the return value should be compared")
+    in_toto_args.add_argument("string", type=str,
+                              help="The string to which the return value "
+                                  "should be compared")
 
     in_toto_args.add_argument("-v", "--verbose", dest="verbose",
-                               help="Verbose execution.", default=False, action="store_true")
+                              help="Verbose execution.", default=False,
+                                  action="store_true")
 
     args = parser.parse_args()
+    args.operator = args.operator.lower()
+    args.outerr = args.outerr.lower()
 
-    if args.verbose:
-      in_toto.log.logging.getLogger.setLevel(log.logging.INFO)
+    if (args.operator != 'is') & (args.operator != 'is not') \
+          & (args.operator != 'contains') & (args.operator != 'contains not'):
+      print('Wrong operator supplied, please supply the correct operator and try again.')
+      return 2
 
-    inspect_byproducts(args.link, args.outerr, args.presence, args.string)
+    elif (args.outerr != 'stdout') & (args.outerr != 'stderr'):
+      print('Please specify only one of the following - stdout, stderr')
+      return 2
+
+    else:
+      if args.verbose:
+        in_toto.log.logging.getLogger.setLevel(log.logging.INFO)
+
+      inspect_byproducts(args.link, args.outerr, args.operator, args.string)
+
 
 if __name__ == "__main__":
     main()
