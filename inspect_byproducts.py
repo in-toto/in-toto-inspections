@@ -13,7 +13,7 @@
   See LICENSE for licensing information.
 
 <Requires>
-  in-toto - installed on the path
+  in-toto
 
 <Purpose>
   Inspections constitute an important part of in-toto. The script take the path
@@ -44,7 +44,6 @@ import securesystemslib.exceptions
 
 def inspect_byproducts(link, std, operator, inputstring):
     """
-
     <Purpose>
     A function which performs the inspection as described above depending on
     various arguments.
@@ -68,50 +67,38 @@ def inspect_byproducts(link, std, operator, inputstring):
 
     <Returns>
       Integer
-        0 - if the inspection is successful
-        1 - if the inspection is unsuccessful
-        2 - if the user supplied arguments are invalid
-
-
 
     """
+
     if not os.path.exists(link):
-        print("The path to the link file is invalid")
-        return 2
+        print("The path to the link file is invalid.")
+        return 3
 
-    else:
-      l = link_import.read_from_file(link)
+    link_imported = link_import.read_from_file(link)
 
-      try:
-        std_out_err = l.byproducts[std]
-      except KeyError:
-        raise KeyError("The field corresponding to " + std + " in the link "
-                                                             "file is empty.")
+    try:
+      std_out_err = link_imported.byproducts[std]
+    except KeyError:
+      raise KeyError("The field corresponding to " + std + " in the link"
+                        " file is empty.")
 
-      switch_dict = {'is': (std_out_err == inputstring),
-                     'is not': (std_out_err != inputstring),
-                     'contains': (std_out_err.find(inputstring)),
-                     'contains not': (std_out_err.find(inputstring))}
+    if operator == 'is':
+      if std_out_err == inputstring:
+        return 0
 
-      if operator == 'is':
-        if switch_dict[operator]:
-          return 0
+    elif operator == 'is not':
+      if std_out_err != inputstring:
+        return 0
 
-      elif operator == 'is not':
-        if switch_dict[operator]:
-          return 0
+    elif operator == 'contains':
+      if std_out_err.find(inputstring) != -1:
+        return 0
 
-      elif operator == 'contains':
-        if switch_dict[operator] != -1:
-          return 0
+    elif operator == 'contains not':
+      if std_out_err.find(inputstring) == -1:
+        return 0
 
-      elif operator == 'contains not':
-        if switch_dict[operator] == -1:
-          return 0
-
-
-      return 1
-
+    return 1
 
 
 def main():
@@ -170,6 +157,7 @@ def main():
         in_toto.log.logging.getLogger.setLevel(log.logging.INFO)
 
       inspect_byproducts(args.link, args.outerr, args.operator, args.string)
+
 
 
 if __name__ == "__main__":
