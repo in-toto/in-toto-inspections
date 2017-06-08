@@ -27,7 +27,7 @@
   the corresponding return field contains an integer less than 5.
 
   The usage would be as follows:
-  python inspect_return_value.py -l /user/abc/def/package.45gh325.link -bsbo "lt" -i 5
+  python inspect_return_value.py -l /user/abc/def/package.45gh325.link -o lt 5
 
   Please note: the various bash style boolean commands are listed as follows-
   * bash-style-boolean-operator
