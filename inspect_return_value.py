@@ -39,8 +39,7 @@
     --ge ... greater than or equal
 
   General usage:
-  python inspect_return_value.py -l <path/to/the/link/file> -bsbo "<bash/style/boolean/operator>" -i <integer>
-
+  python inspect_return_value.py -l <path/to/the/link/file> -o <operator> <integer>
 
 """
 import os
@@ -53,56 +52,74 @@ import securesystemslib.exceptions
 
 def inspect_return_value(link, operator, integer):
     """
+    <Purpose>
+      A function which performs the inspection as described above depending on various arguments.
+      Prints the boolean True or False depending upon the inspection result.
 
-        <Purpose>
-        A function which performs the inspection as described above depending on various arguments.
-        Prints the boolean True or False depending upon the inspection result.
+    <Arguments>
+      link:
+        the path to the link file
 
-        <Arguments>
-         link:
-             the path to the link file
+      operator:
+        bash style boolean operator
 
-         operator:
-             bash style boolean operator
+      integer:
+        the integer to which the return value should be compared
+        Note: the comparison happens treating the integer as a consequent,
+        for example: given "lt" as an operator, it will inspect whether
+        (the return value) <= (the given integer)
 
-         integer:
-             the integer to which the return value should be compared
-             Note: the comparison happens treating the integer as a consequent,
-             for example: given "lt" as an operator, it will inspect whether
-             (the return value) <= (the given integer)
+    <Exceptions>
+      None
 
-        <Exceptions>
-            Yet to add
+    <Returns>
+      Integer
+      0 - If
+      1 - if false
 
-        <Returns>
-             None.
+    """
+    if not os.path.exists(link):
+        print("The path to the link file is invalid.")
+        return 3
+    else:
+      imported_link = link_import.read_from_file(link)
+      if operator == 'eq':
+        if integer == imported_link.return_value:
+          return 0
 
+      elif operator == 'ne':
+        if integer != imported_link.return_value:
+          return 0
 
-        """
+      elif operator == 'lt':
+        if integer > imported_link.return_value:
+          return 0
 
+      elif operator == 'le':
+        if integer >= imported_link.return_value:
+          return 0
 
-    l = link_import.read_from_file(link)
-    switch_dict = {'eq': (integer == l.return_value),
-                   'ne': (integer != l.return_value),
-                   'lt': (integer > l.return_value),
-                   'le': (integer >= l.return_value),
-                   'gt': (integer < l.return_value),
-                   'ge': (integer <= l.return_value)}
-    print(switch_dict[operator])
+      elif operator == 'gt':
+        if integer < imported_link.return_value:
+          return 0
 
+      elif operator == 'ge':
+        if integer <= imported_link.return_value:
+          return 0
 
+      return 1
 
 
 def main():
 
     parser = argparse.ArgumentParser(
-        description="Inspects the return value of a step")
+      description="Inspects the return value of a step")
 
     lpad = (len(parser.prog) + 1) * " "
 
     parser.usage = ("\n"
                     "%(prog)s --link <path to link metadata>\n{0}"
-                    "[--<bash-style-boolean-operator>]\n{0}"
+                    "[--<operator>]\n{0}"
                     "<integer>\n{0}"
                     "[--verbose]\n\n"
                     .format(lpad))
@@ -112,22 +129,29 @@ def main():
     in_toto_args.add_argument("-l", "--link", type=str, required=True,
                               help="Link metadata file to use for inspection of the step")
 
-    in_toto_args.add_argument("-bsbo", "--bashstylebooleanoperator",
+    in_toto_args.add_argument("-o", "--operator",
                               type=str, required=True, help="The boolen operator \
-            used to compare the return value with given int")
+                              used to compare the return value with given int")
 
-    in_toto_args.add_argument("-i", "--integer", type=int, required=True,
+    in_toto_args.add_argument("integer", type=int,
                               help="The integer to which the return value should be compared")
 
     in_toto_args.add_argument("-v", "--verbose", dest="verbose",
                                help="Verbose execution.", default=False, action="store_true")
 
     args = parser.parse_args()
+    args.operator = args.operator.lower()
 
-    if args.verbose:
+    if (args.operator != 'eq') & (args.operator != 'ne') \
+          & (args.operator != 'lt') & (args.operator != 'le') & (args.operator != 'ge') \
+            & (args.operator != 'gt'):
+      print('Wrong operator supplied, please supply the correct operator and try again.')
+      return 2
+    else:
+      if args.verbose:
         log.logging.getLogger.setLevel(log.logging.INFO)
 
-    inspect_return_value(args.link, args.bashstylebooleanoperator, args.integer)
+      inspect_return_value(args.link, args.operator, args.integer)
 
 
 if __name__ == "__main__":

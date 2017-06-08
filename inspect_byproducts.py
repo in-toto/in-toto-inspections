@@ -1,5 +1,4 @@
 """
-
 <Program Name>
   inspect_byproducts.py
 
@@ -30,7 +29,6 @@
   General usage:
   python inspect_byproducts.py -l  <path/to/link/metadata/file>  -st <stdout|stderr>
     -o [ is | is not | contains | contains not] <string to be tested>
-
 
 """
 
@@ -67,6 +65,10 @@ def inspect_byproducts(link, std, operator, inputstring):
 
     <Returns>
       Integer
+      0 - True
+      1 - False
+      2 - Wrong input supplied
+      3 - IOError (Link file is non existent/ path to the link file is invalid
 
     """
 
@@ -74,10 +76,10 @@ def inspect_byproducts(link, std, operator, inputstring):
         print("The path to the link file is invalid.")
         return 3
 
-    link_imported = link_import.read_from_file(link)
+    imported_link = link_import.read_from_file(link)
 
     try:
-      std_out_err = link_imported.byproducts[std]
+      std_out_err = imported_link.byproducts[std]
     except KeyError:
       raise KeyError("The field corresponding to " + std + " in the link"
                         " file is empty.")
