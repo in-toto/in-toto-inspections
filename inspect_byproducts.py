@@ -104,17 +104,17 @@ def inspect_byproducts(link, std, operator, inputstring):
 
 def parse_args():
     """
-        <Purpose>
-        A function which parses the user supplied arguments
+    <Purpose>
+      A function which parses the user supplied arguments
 
-        <Arguments>
-          None
+    <Arguments>
+      None
 
-        <Exceptions>
-          None
+    <Exceptions>
+      None
 
-        <Returns>
-          Parsed arguments (args object)
+    <Returns>
+      Parsed arguments (args object)
 
      """
     parser = argparse.ArgumentParser(

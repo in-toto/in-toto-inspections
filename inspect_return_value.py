@@ -109,11 +109,24 @@ def inspect_return_value(link, operator, integer):
 
       return 1
 
+def parse_args():
 
-def main():
+    """
+    <Purpose>
+      A function which parses the user supplied arguments.
 
+    <Arguments>
+      None
+
+    <Exceptions>
+      None
+
+    <Returns>
+      Parsed arguments (args object)
+
+    """
     parser = argparse.ArgumentParser(
-      description="Inspects the return value of a step")
+        description="Inspects the return value of a step")
 
     lpad = (len(parser.prog) + 1) * " "
 
@@ -131,16 +144,26 @@ def main():
 
     in_toto_args.add_argument("-o", "--operator",
                               type=str, required=True, help="The boolen operator \
-                              used to compare the return value with given int")
+                                  used to compare the return value with given int")
 
     in_toto_args.add_argument("integer", type=int,
                               help="The integer to which the return value should be compared")
 
     in_toto_args.add_argument("-v", "--verbose", dest="verbose",
-                               help="Verbose execution.", default=False, action="store_true")
+                              help="Verbose execution.", default=False, action="store_true")
 
     args = parser.parse_args()
     args.operator = args.operator.lower()
+
+    return args
+
+def main():
+    """
+    First calls parse_args() to parse the arguments and then calls
+    inspect_return_value to inspect the return value.
+
+    """
+    args = parse_args()
 
     if (args.operator != 'eq') & (args.operator != 'ne') \
           & (args.operator != 'lt') & (args.operator != 'le') & (args.operator != 'ge') \
