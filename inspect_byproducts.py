@@ -102,9 +102,21 @@ def inspect_byproducts(link, std, operator, inputstring):
 
     return 1
 
+def parse_args():
+    """
+        <Purpose>
+        A function which parses the user supplied arguments
 
-def main():
-    """Parse the arguments and call inspect_byproducts. """
+        <Arguments>
+          None
+
+        <Exceptions>
+          None
+
+        <Returns>
+          Parsed arguments (args object)
+
+     """
     parser = argparse.ArgumentParser(
         description="Inspects the byproducts of a step")
 
@@ -122,28 +134,39 @@ def main():
 
     in_toto_args.add_argument("-l", "--link", type=str, required=True,
                               help="Link metadata file to use for inspection "
-                                  "of the step")
+                                   "of the step")
 
     in_toto_args.add_argument("-st", "--outerr",
                               type=str, required=True, help="when stdout or "
-                                  "stderr is a byproduct")
+                                                            "stderr is a byproduct")
 
     in_toto_args.add_argument("-o", "--operator",
                               type=str, required=True, help="whether the "
-                                  "stdout or stderr is, is not, \ "
-                                  "contains, contains not, the input string")
+                                                            "stdout or stderr is, is not, \ "
+                                                            "contains, contains not, the input string")
 
     in_toto_args.add_argument("string", type=str,
                               help="The string to which the return value "
-                                  "should be compared")
+                                   "should be compared")
 
     in_toto_args.add_argument("-v", "--verbose", dest="verbose",
                               help="Verbose execution.", default=False,
-                                  action="store_true")
+                              action="store_true")
 
     args = parser.parse_args()
     args.operator = args.operator.lower()
     args.outerr = args.outerr.lower()
+
+    return args
+
+def main():
+    """
+    First calls parse_args() to parse the arguments and then calls
+    inspect_byproducts to inspect the byproducts
+
+    """
+
+    args = parse_args()
 
     if (args.operator != 'is') & (args.operator != 'is not') \
           & (args.operator != 'contains') & (args.operator != 'contains not'):
