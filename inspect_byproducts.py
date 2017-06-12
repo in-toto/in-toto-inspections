@@ -123,20 +123,20 @@ def parse_args():
 
     in_toto_args.add_argument("-l", "--link", type=str, required=True,
                               help="Link metadata file to use for inspection "
-                                "of the step")
+                              "of the step")
 
     in_toto_args.add_argument("-st", "--outerr",
                               type=str, required=True, help="when stdout or "
-                                "stderr is a byproduct")
+                              "stderr is a byproduct")
 
     in_toto_args.add_argument("-o", "--operator",
                               type=str, required=True, help="whether the "
-                                "stdout or stderr is, is not,"
-                                "contains, contains not, the input string")
+                              "stdout or stderr is, is not,"
+                              "contains, contains not, the input string")
 
     in_toto_args.add_argument("string", type=str,
                               help="The string to which the return value "
-                                "should be compared")
+                              "should be compared")
 
     in_toto_args.add_argument("-v", "--verbose", dest="verbose",
                               help="Verbose execution.", default=False,
@@ -173,9 +173,6 @@ def main():
       except Exception as e:
         print('The following error occured',e)
         sys.exit(4)
-
-
-
 
 
 

@@ -71,43 +71,39 @@ def inspect_return_value(link, operator, integer):
       None
 
     <Returns>
-      Integer
-      0 - True
-      1 - False
-      2 - Wrong Input
-      3 - IOError (Link file is non existent/ path to the link file is invalid)
+      Boolean
 
     """
-    if not os.path.exists(link):
-        print("The path to the link file is invalid.")
-        return 3
+
+    imported_link = link_import.read_from_file(link)
+    if operator == 'eq':
+      if integer == imported_link.return_value:
+        return True
+
+    elif operator == 'ne':
+      if integer != imported_link.return_value:
+        return True
+
+    elif operator == 'lt':
+      if integer > imported_link.return_value:
+        return True
+
+    elif operator == 'le':
+      if integer >= imported_link.return_value:
+        return True
+
+    elif operator == 'gt':
+      if integer < imported_link.return_value:
+        return True
+
+    elif operator == 'ge':
+      if integer <= imported_link.return_value:
+        return True
+
     else:
-      imported_link = link_import.read_from_file(link)
-      if operator == 'eq':
-        if integer == imported_link.return_value:
-          return 0
+      raise Exception('Invalid Operator')
 
-      elif operator == 'ne':
-        if integer != imported_link.return_value:
-          return 0
-
-      elif operator == 'lt':
-        if integer > imported_link.return_value:
-          return 0
-
-      elif operator == 'le':
-        if integer >= imported_link.return_value:
-          return 0
-
-      elif operator == 'gt':
-        if integer < imported_link.return_value:
-          return 0
-
-      elif operator == 'ge':
-        if integer <= imported_link.return_value:
-          return 0
-
-      return 1
+    return False
 
 def parse_args():
 
@@ -140,17 +136,20 @@ def parse_args():
     in_toto_args = parser.add_argument_group("in-toto-inspection options")
 
     in_toto_args.add_argument("-l", "--link", type=str, required=True,
-                              help="Link metadata file to use for inspection of the step")
+                              help="Link metadata file to use for inspection "
+                              "of the step")
 
     in_toto_args.add_argument("-o", "--operator",
-                              type=str, required=True, help="The boolen operator \
-                                  used to compare the return value with given int")
+                              type=str, required=True, help="The boolen operator "
+                              "used to compare the return value with given int")
 
     in_toto_args.add_argument("integer", type=int,
-                              help="The integer to which the return value should be compared")
+                              help="The integer to which the return value "
+                              "should be compared")
 
     in_toto_args.add_argument("-v", "--verbose", dest="verbose",
-                              help="Verbose execution.", default=False, action="store_true")
+                              help="Verbose execution.", default=False,
+                              action="store_true")
 
     args = parser.parse_args()
     args.operator = args.operator.lower()
@@ -165,16 +164,18 @@ def main():
     """
     args = parse_args()
 
-    if (args.operator != 'eq') & (args.operator != 'ne') \
-          & (args.operator != 'lt') & (args.operator != 'le') & (args.operator != 'ge') \
-            & (args.operator != 'gt'):
-      print('Wrong operator supplied, please supply the correct operator and try again.')
-      return 2
-    else:
-      if args.verbose:
-        log.logging.getLogger.setLevel(log.logging.INFO)
 
-      inspect_return_value(args.link, args.operator, args.integer)
+    if args.verbose:
+      log.logging.getLogger.setLevel(log.logging.INFO)
+
+    try:
+      if inspect_return_value(args.link, args.operator, args.integer):
+        sys.exit(0)
+      else:
+        sys.exit(1)
+    except Exception as e:
+      print('The following error occured',e)
+      sys.exit(2)
 
 
 if __name__ == "__main__":
