@@ -61,46 +61,35 @@ def inspect_byproducts(link, std, operator, inputstring):
 
     <Exceptions>
       Raises KeyError, in case the field corresponding to the key
-        in the dictionary is empty
+      in the dictionary is empty
 
     <Returns>
-      Integer
-      0 - True
-      1 - False
-      2 - Wrong input
-      3 - IOError (Link file is non existent/ path to the link file is invalid
-
+      Boolean
     """
-
-    if not os.path.exists(link):
-        print("The path to the link file is invalid.")
-        return 3
 
     imported_link = link_import.read_from_file(link)
 
-    try:
-      std_out_err = imported_link.byproducts[std]
-    except KeyError:
-      raise KeyError("The field corresponding to " + std + " in the link"
-                        " file is empty.")
+    std_out_err = imported_link.byproducts[std]
 
     if operator == 'is':
       if std_out_err == inputstring:
-        return 0
+        return True
 
     elif operator == 'is not':
       if std_out_err != inputstring:
-        return 0
+        return True
 
     elif operator == 'contains':
       if std_out_err.find(inputstring) != -1:
-        return 0
+        return True
 
     elif operator == 'contains not':
       if std_out_err.find(inputstring) == -1:
-        return 0
+        return True
+    else:
+      raise Exception('Invalid operator')
 
-    return 1
+    return False
 
 def parse_args():
     """
@@ -134,20 +123,20 @@ def parse_args():
 
     in_toto_args.add_argument("-l", "--link", type=str, required=True,
                               help="Link metadata file to use for inspection "
-                                   "of the step")
+                                "of the step")
 
     in_toto_args.add_argument("-st", "--outerr",
                               type=str, required=True, help="when stdout or "
-                                                            "stderr is a byproduct")
+                                "stderr is a byproduct")
 
     in_toto_args.add_argument("-o", "--operator",
                               type=str, required=True, help="whether the "
-                                                            "stdout or stderr is, is not, \ "
-                                                            "contains, contains not, the input string")
+                                "stdout or stderr is, is not,"
+                                "contains, contains not, the input string")
 
     in_toto_args.add_argument("string", type=str,
                               help="The string to which the return value "
-                                   "should be compared")
+                                "should be compared")
 
     in_toto_args.add_argument("-v", "--verbose", dest="verbose",
                               help="Verbose execution.", default=False,
@@ -168,20 +157,25 @@ def main():
 
     args = parse_args()
 
-    if (args.operator != 'is') & (args.operator != 'is not') \
-          & (args.operator != 'contains') & (args.operator != 'contains not'):
-      print('Wrong operator supplied, please supply the correct operator and try again.')
-      return 2
-
-    elif (args.outerr != 'stdout') & (args.outerr != 'stderr'):
+    if (args.outerr != 'stdout') & (args.outerr != 'stderr'):
       print('Please specify only one of the following - stdout, stderr')
-      return 2
+      sys.exit(3)
 
     else:
       if args.verbose:
         in_toto.log.logging.getLogger.setLevel(log.logging.INFO)
 
-      inspect_byproducts(args.link, args.outerr, args.operator, args.string)
+      try:
+        if inspect_byproducts(args.link, args.outerr, args.operator, args.string):
+          sys.exit(0)
+        else:
+          sys.exit(1)
+      except Exception as e:
+        print('The following error occured',e)
+        sys.exit(4)
+
+
+
 
 
 
