@@ -24,12 +24,11 @@
   the corresponding stderr field contains the string "test".
 
   The usage would be as follows:
-  python inspect_byproducts.py -l  /user/abc/def/package.45gh325.link  -st stderr -o contains test
+  python inspect_byproducts.py -l  /user/abc/def/package.45gh325.link  -t stderr -o contains test
 
   General usage:
-  python inspect_byproducts.py -l  <path/to/link/metadata/file>  -st <stdout|stderr>
+  python inspect_byproducts.py -l  <path/to/link/metadata/file>  -t <stdout|stderr>
     -o [ is | is not | contains | contains not] <string to be tested>
-
 """
 
 import os
@@ -40,7 +39,7 @@ from in_toto.models.link import Link as link_import
 import securesystemslib.exceptions
 
 
-def inspect_byproducts(link, std, operator, inputstring):
+def inspect_byproducts(link, type, operator, input_string):
     """
     <Purpose>
     A function which performs the inspection as described above depending on
@@ -56,7 +55,7 @@ def inspect_byproducts(link, std, operator, inputstring):
       operator:
         is | is not | contains | contains not
 
-     inputstring:
+      inputstring:
         the string to be checked
 
     <Exceptions>
@@ -69,32 +68,31 @@ def inspect_byproducts(link, std, operator, inputstring):
 
     imported_link = link_import.read_from_file(link)
 
-    std_out_err = imported_link.byproducts[std]
+    std_out_err = imported_link.byproducts[type]
 
     if operator == 'is':
-      if std_out_err == inputstring:
+      if std_out_err == input_string:
         return True
 
     elif operator == 'is not':
-      if std_out_err != inputstring:
+      if std_out_err != input_string:
         return True
 
     elif operator == 'contains':
-      if std_out_err.find(inputstring) != -1:
+      if std_out_err.find(input_string) != -1:
         return True
 
     elif operator == 'contains not':
-      if std_out_err.find(inputstring) == -1:
+      if std_out_err.find(input_string) == -1:
         return True
-    else:
-      raise Exception('Invalid operator')
 
     return False
+
 
 def parse_args():
     """
     <Purpose>
-      A function which parses the user supplied arguments
+      A function which parses the user supplied arguments.
 
     <Arguments>
       None
@@ -104,8 +102,7 @@ def parse_args():
 
     <Returns>
       Parsed arguments (args object)
-
-     """
+    """
     parser = argparse.ArgumentParser(
         description="Inspects the byproducts of a step")
 
@@ -113,10 +110,10 @@ def parse_args():
 
     parser.usage = ("\n"
                     "%(prog)s --link <path to link metadata>\n{0}"
-                    "[--stdout | --stderr]\n{0}"
-                    "[--is | --is-not | --contains | --contains-not]\n{0}"
-                    "string\n{0}"
-                    "[--verbose]\n\n"
+                    "[--type of field to be inspected (--stdout | --stderr)]\n{0}"
+                    "[--operator (--is | --is not | --contains | --"
+                    "contains  not)]\n{0}"
+                    "string\n\n"
                     .format(lpad))
 
     in_toto_args = parser.add_argument_group("in-toto-inspection options")
@@ -125,12 +122,13 @@ def parse_args():
                               help="Link metadata file to use for inspection "
                               "of the step")
 
-    in_toto_args.add_argument("-st", "--outerr",
-                              type=str, required=True, help="when stdout or "
+    in_toto_args.add_argument("-t", "--type", choices=['stdout', 'stderr'],
+                              type=str, required=True, help="Whether stdout or "
                               "stderr is a byproduct")
 
-    in_toto_args.add_argument("-o", "--operator",
-                              type=str, required=True, help="whether the "
+    in_toto_args.add_argument("-o", "--operator", choices=['is', 'is not',
+                              'contains', 'contains not'], type=str,
+                              required=True, help="whether "
                               "stdout or stderr is, is not,"
                               "contains, contains not, the input string")
 
@@ -138,42 +136,27 @@ def parse_args():
                               help="The string to which the return value "
                               "should be compared")
 
-    in_toto_args.add_argument("-v", "--verbose", dest="verbose",
-                              help="Verbose execution.", default=False,
-                              action="store_true")
-
     args = parser.parse_args()
     args.operator = args.operator.lower()
-    args.outerr = args.outerr.lower()
+    args.type = args.type.lower()
 
     return args
+
 
 def main():
     """
     First calls parse_args() to parse the arguments and then calls
     inspect_byproducts to inspect the byproducts
-
     """
-
     args = parse_args()
-
-    if (args.outerr != 'stdout') & (args.outerr != 'stderr'):
-      print('Please specify only one of the following - stdout, stderr')
-      sys.exit(3)
-
-    else:
-      if args.verbose:
-        in_toto.log.logging.getLogger.setLevel(log.logging.INFO)
-
-      try:
-        if inspect_byproducts(args.link, args.outerr, args.operator, args.string):
-          sys.exit(0)
-        else:
-          sys.exit(1)
-      except Exception as e:
-        print('The following error occured',e)
-        sys.exit(4)
-
+    try:
+      if inspect_byproducts(args.link, args.type, args.operator, args.string):
+        sys.exit(0)
+      else:
+        sys.exit(1)
+    except Exception as e:
+      print('The following error occured',e)
+      sys.exit(2)
 
 
 if __name__ == "__main__":

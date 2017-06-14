@@ -98,9 +98,6 @@ def inspect_return_value(link, operator, integer):
       if integer <= imported_link.return_value:
         return True
 
-    else:
-      raise Exception('Invalid Operator')
-
     return False
 
 def parse_args():
@@ -127,8 +124,7 @@ def parse_args():
     parser.usage = ("\n"
                     "%(prog)s --link <path to link metadata>\n{0}"
                     "[--<operator>]\n{0}"
-                    "<integer>\n{0}"
-                    "[--verbose]\n\n"
+                    "<integer>\n\n"
                     .format(lpad))
 
     in_toto_args = parser.add_argument_group("in-toto-inspection options")
@@ -137,17 +133,15 @@ def parse_args():
                               help="Link metadata file to use for inspection "
                               "of the step")
 
-    in_toto_args.add_argument("-o", "--operator",
-                              type=str, required=True, help="The boolen operator "
-                              "used to compare the return value with given int")
+    in_toto_args.add_argument("-o", "--operator", choices=['eq', 'ne',
+                              'lt', 'le', 'gt', 'ge'], type=str,
+                              required=True, help="The boolen operator "
+                              "used to compare the return value with given "
+                              "int")
 
     in_toto_args.add_argument("integer", type=int,
                               help="The integer to which the return value "
                               "should be compared")
-
-    in_toto_args.add_argument("-v", "--verbose", dest="verbose",
-                              help="Verbose execution.", default=False,
-                              action="store_true")
 
     args = parser.parse_args()
     args.operator = args.operator.lower()
@@ -161,10 +155,6 @@ def main():
 
     """
     args = parse_args()
-
-
-    if args.verbose:
-      log.logging.getLogger.setLevel(log.logging.INFO)
 
     try:
       if inspect_return_value(args.link, args.operator, args.integer):
