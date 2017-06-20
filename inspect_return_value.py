@@ -20,8 +20,8 @@
   operator.
 
   Suppose the link file is located at /user/abc/def/package.45gh325.link
-  and the user wants to check whether for the corresponding step(hence the link file),
-  the corresponding return field contains an integer less than 5.
+  and the user wants to check whether for the corresponding step (hence the
+  link file), the corresponding return field contains an integer less than 5.
 
   The usage would be as follows:
   python inspect_return_value.py -l /user/abc/def/package.45gh325.link -o lt 5
@@ -36,7 +36,8 @@
     --ge ... greater than or equal
 
   General usage:
-  python inspect_return_value.py -l <path/to/the/link/file> -o <operator> <integer>
+  python inspect_return_value.py -l <path/to/the/link/file> -o <operator>
+    <integer>
 
 """
 import os
@@ -50,7 +51,8 @@ import securesystemslib.exceptions
 def inspect_return_value(link, operator, integer):
     """
     <Purpose>
-      A function which performs the inspection as described above depending on various arguments.
+      A function which performs the inspection as described above depending
+      on various arguments.
 
     <Arguments>
       link:
@@ -75,28 +77,22 @@ def inspect_return_value(link, operator, integer):
 
     imported_link = link_import.read_from_file(link)
     if operator == 'eq':
-      if integer == imported_link.return_value:
-        return True
+      return integer == imported_link.return_value
 
     elif operator == 'ne':
-      if integer != imported_link.return_value:
-        return True
+      return integer != imported_link.return_value
 
     elif operator == 'lt':
-      if integer > imported_link.return_value:
-        return True
+      return integer > imported_link.return_value
 
     elif operator == 'le':
-      if integer >= imported_link.return_value:
-        return True
+      return integer >= imported_link.return_value
 
     elif operator == 'gt':
-      if integer < imported_link.return_value:
-        return True
+      return integer < imported_link.return_value
 
     elif operator == 'ge':
-      if integer <= imported_link.return_value:
-        return True
+      return integer <= imported_link.return_value
 
     return False
 
@@ -123,7 +119,8 @@ def parse_args():
 
     parser.usage = ("\n"
                     "%(prog)s --link <path to link metadata>\n{0}"
-                    "[--<operator>]\n{0}"
+                    "[--operator ('eq' | 'ne' | 'lt' | 'le' | 'gt' | "
+                      "'ge')]\n{0}"
                     "<integer>\n\n"
                     .format(lpad))
 
@@ -135,7 +132,7 @@ def parse_args():
 
     in_toto_args.add_argument("-o", "--operator", choices=['eq', 'ne',
                               'lt', 'le', 'gt', 'ge'], type=str,
-                              required=True, help="The boolen operator "
+                              required=True, help="The logical operator "
                               "used to compare the return value with given "
                               "int")
 
@@ -147,6 +144,7 @@ def parse_args():
     args.operator = args.operator.lower()
 
     return args
+
 
 def main():
     """
@@ -162,7 +160,7 @@ def main():
       else:
         sys.exit(1)
     except Exception as e:
-      print('The following error occured',e)
+      print('The following error occured', e)
       sys.exit(2)
 
 
