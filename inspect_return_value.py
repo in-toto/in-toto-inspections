@@ -94,6 +94,10 @@ def inspect_return_value(link, operator, integer):
     elif operator == 'ge':
       return integer <= imported_link.return_value
 
+    else:
+      raise('Invalid operator ' + operator + '. Valid operators: eq | ne | '
+        'lt | le | gt | ge')
+
     return False
 
 def parse_args():

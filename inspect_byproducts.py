@@ -87,6 +87,9 @@ def inspect_byproducts(link, type, operator, input_string):
     elif operator == 'contains-not':
       if std_out_err.find(input_string) == -1:
         return True
+    else:
+      raise('Invalid Operator ' + operator + '. Valid operators: is | is-not |'
+        ' contains | contains-not')
 
     return False
 
