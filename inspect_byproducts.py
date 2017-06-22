@@ -88,8 +88,9 @@ def inspect_byproducts(link, type, operator, input_string):
       if std_out_err.find(input_string) == -1:
         return True
     else:
-      raise('Invalid Operator ' + operator + '. Valid operators: is | is-not |'
-        ' contains | contains-not')
+        raise Exception(
+            "Invalid operator {}. Valid operators: is | is-not | contains | "
+            "contains-not".format(operator))
 
     return False
 
@@ -124,12 +125,11 @@ def parse_args():
     in_toto_args = parser.add_argument_group("in-toto-inspection options")
 
     in_toto_args.add_argument("-l", "--link", type=str, required=True,
-                              help="Link metadata file to use for inspection"
-                              " of the step")
+                              help="Path to the link file to be inspected")
 
     in_toto_args.add_argument("-t", "--type", choices=['stdout', 'stderr'],
-                              type=str, required=True, help="Whether stdout or"
-                              " stderr is a byproduct")
+                              type=str, required=True, help="Type of "
+                              "byproduct to inspect (stdout | stderr")
 
     in_toto_args.add_argument("-o", "--operator", choices=['is', 'is-not',
                               'contains', 'contains-not'], type=str,
@@ -138,8 +138,8 @@ def parse_args():
                               "contains, contains not, the input string")
 
     in_toto_args.add_argument("string", type=str,
-                              help="The string to which the return value "
-                              "should be compared")
+                              help="The string to compare with the specified "
+                              "byproduct in the specified link file")
 
     args = parser.parse_args()
     args.operator = args.operator.lower()

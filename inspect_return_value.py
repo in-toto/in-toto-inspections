@@ -95,8 +95,9 @@ def inspect_return_value(link, operator, integer):
       return integer <= imported_link.return_value
 
     else:
-      raise('Invalid operator ' + operator + '. Valid operators: eq | ne | '
-        'lt | le | gt | ge')
+        raise Exception(
+            "Invalid operator {}. Valid operators: eq | ne | lt | le | gt | "
+            "ge".format(operator))
 
     return False
 
@@ -131,8 +132,7 @@ def parse_args():
     in_toto_args = parser.add_argument_group("in-toto-inspection options")
 
     in_toto_args.add_argument("-l", "--link", type=str, required=True,
-                              help="Link metadata file to use for inspection "
-                              "of the step")
+                              help="Path to the link file to be inspected")
 
     in_toto_args.add_argument("-o", "--operator", choices=['eq', 'ne',
                               'lt', 'le', 'gt', 'ge'], type=str,
