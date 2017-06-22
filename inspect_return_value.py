@@ -28,12 +28,12 @@
 
   Please note: the various bash style boolean commands are listed as follows-
   * bash-style-boolean-operator
-    --eq ... equal
-    --ne ... not equal
-    --lt ... less than
-    --le ... less than or equal
-    --gt ... greater than
-    --ge ... greater than or equal
+    eq ... equal
+    ne ... not equal
+    lt ... less than
+    le ... less than or equal
+    gt ... greater than
+    ge ... greater than or equal
 
   General usage:
   python inspect_return_value.py -l <path/to/the/link/file> -o <operator>
