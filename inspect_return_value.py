@@ -99,7 +99,6 @@ def inspect_return_value(link, operator, integer):
             "Invalid operator {}. Valid operators: eq | ne | lt | le | gt | "
             "ge".format(operator))
 
-    return False
 
 def parse_args():
 
@@ -120,19 +119,11 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Inspects the return value of a step")
 
-    lpad = (len(parser.prog) + 1) * " "
-
-    parser.usage = ("\n"
-                    "%(prog)s --link <path to link metadata>\n{0}"
-                    "[--operator ('eq' | 'ne' | 'lt' | 'le' | 'gt' | "
-                      "'ge')]\n{0}"
-                    "<integer>\n\n"
-                    .format(lpad))
-
     in_toto_args = parser.add_argument_group("in-toto-inspection options")
 
     in_toto_args.add_argument("-l", "--link", type=str, required=True,
-                              help="Path to the link file to be inspected")
+                              help="Path to the link file to be inspected",
+                              metavar="<Path to link metadata>")
 
     in_toto_args.add_argument("-o", "--operator", choices=['eq', 'ne',
                               'lt', 'le', 'gt', 'ge'], type=str,
@@ -142,7 +133,8 @@ def parse_args():
 
     in_toto_args.add_argument("integer", type=int,
                               help="The integer to which the return value "
-                              "should be compared")
+                              "should be compared", metavar="<Integer to "
+                              "compare>")
 
     args = parser.parse_args()
     args.operator = args.operator.lower()

@@ -112,20 +112,11 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Inspects the byproducts of a step")
 
-    lpad = (len(parser.prog) + 1) * " "
-
-    parser.usage = ("\n"
-                    "%(prog)s --link <path to link metadata>\n{0}"
-                    "[--type (--stdout | --stderr)]\n{0}"
-                    "[--operator (--is | --is-not | --contains | --"
-                    "contains-not)]\n{0}"
-                    "string\n\n"
-                    .format(lpad))
-
     in_toto_args = parser.add_argument_group("in-toto-inspection options")
 
     in_toto_args.add_argument("-l", "--link", type=str, required=True,
-                              help="Path to the link file to be inspected")
+                              help="Path to the link file to be inspected",
+                              metavar="<Path to link metadata>")
 
     in_toto_args.add_argument("-t", "--type", choices=['stdout', 'stderr'],
                               type=str, required=True, help="Type of "
@@ -139,7 +130,8 @@ def parse_args():
 
     in_toto_args.add_argument("string", type=str,
                               help="The string to compare with the specified "
-                              "byproduct in the specified link file")
+                              "byproduct in the specified link file",
+                              metavar="<String to compare>")
 
     args = parser.parse_args()
     args.operator = args.operator.lower()
