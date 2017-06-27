@@ -19,12 +19,12 @@
   of a link file, a random string and an operator, which is used to compare
   a certain property of the link file with the random string.
 
-  Suppose the link file is located at /user/abc/def/package.45gh325.link
+  Suppose the link file is located at /user/abc/def/package.45fe325.link
   and the user wants to check whether for the corresponding step (hence the
   link file), the corresponding stderr field contains the string "test".
 
   The usage would be as follows:
-  python inspect_byproducts.py -l  /user/abc/def/package.45gh325.link  -t
+  python inspect_byproducts.py -l  /user/abc/def/package.45fe325.link  -t
     stderr -o contains test
 
   General usage:
